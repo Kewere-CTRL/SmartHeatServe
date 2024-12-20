@@ -1,7 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
 module.exports = async function database(configuration) {
-    var database = {
+    const database = {
         sequelize: require('sequelize'),
         connection: '',
         query: '',
@@ -19,29 +19,36 @@ module.exports = async function database(configuration) {
         }
     );
 
-    database.query = async (query) => { return await database.connection.query(query) };
+    database.query = async (query) => {
+        return await database.connection.query(query);
+    };
 
-    // Role
+    // Таблица Role
     database.publicSchema.roleTable = database.connection.define('role', {
         label: { type: DataTypes.STRING, unique: true, allowNull: false }
     }, { Sequelize, freezeTableName: true, timestamps: false });
-    // User
+
+    // Таблица User
     database.publicSchema.userTable = database.connection.define('user', {
-        username: { type: DataTypes.STRING,  allowNull: false, unique: true },
-        password: { type: DataTypes.STRING,  allowNull: false },
-        fullName: { type: DataTypes.STRING,  allowNull: false },
-        roleId:   { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0, references: { model: database.publicSchema.roleTable , key: 'id' }, onDelete: 'SET DEFAULT', onUpdate: 'CASCADE' }
+        username: { type: DataTypes.STRING, allowNull: false, unique: true },
+        password: { type: DataTypes.STRING, allowNull: false },
+        fullName: { type: DataTypes.STRING, allowNull: false },
+        roleId: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0, references: { model: database.publicSchema.roleTable, key: 'id' }, onDelete: 'SET DEFAULT', onUpdate: 'CASCADE' }
     }, { Sequelize, freezeTableName: true, timestamps: false });
-    database.publicSchema.roleTable.hasMany(database.publicSchema.userTable); database.publicSchema.userTable.belongsTo(database.publicSchema.roleTable);
 
-    // Token
+    database.publicSchema.roleTable.hasMany(database.publicSchema.userTable);
+    database.publicSchema.userTable.belongsTo(database.publicSchema.roleTable);
+
+    // Таблица Token
     database.publicSchema.tokenTable = database.connection.define('token', {
-        userId: { type: DataTypes.INTEGER, allowNull: false, unique: true, references: { model: database.publicSchema.userTable , key: 'id' }, onDelete: 'CASCADE', onUpdate: 'CASCADE' },
-        token:  { type: DataTypes.STRING,  allowNull: false, unique: true }
+        userId: { type: DataTypes.INTEGER, allowNull: false, unique: true, references: { model: database.publicSchema.userTable, key: 'id' }, onDelete: 'CASCADE', onUpdate: 'CASCADE' },
+        token: { type: DataTypes.TEXT, allowNull: false, unique: true }
     }, { Sequelize, freezeTableName: true, timestamps: false });
 
-    database.publicSchema.userTable.hasOne (database.publicSchema.tokenTable); database.publicSchema.tokenTable.belongsTo(database.publicSchema.userTable);
+    database.publicSchema.userTable.hasOne(database.publicSchema.tokenTable);
+    database.publicSchema.tokenTable.belongsTo(database.publicSchema.userTable);
 
+    // Таблица TimeZone
     database.publicSchema.timeZoneTable = database.connection.define('timeZone', {
         label: { type: DataTypes.STRING, allowNull: false }
     }, { Sequelize, freezeTableName: true, timestamps: false });
@@ -51,7 +58,7 @@ module.exports = async function database(configuration) {
         label: { type: DataTypes.STRING, allowNull: false, unique: true }
     }, { Sequelize, freezeTableName: true, timestamps: false });
 
-
+    // Таблица Object
     database.publicSchema.objectTable = database.connection.define('object', {
         label: { type: DataTypes.STRING },
         city: { type: DataTypes.STRING },
@@ -71,8 +78,6 @@ module.exports = async function database(configuration) {
         createdAt: { type: DataTypes.BIGINT },
     }, { Sequelize, freezeTableName: true, timestamps: false });
 
-
-
     database.publicSchema.timeZoneTable.hasMany(database.publicSchema.objectTable, {
         foreignKey: 'timeZone_id'
     });
@@ -82,22 +87,28 @@ module.exports = async function database(configuration) {
 
     // Таблица ResponsiblePerson
     database.publicSchema.responsiblePersonTable = database.connection.define('responsiblePerson', {
-        fullName:     { type: DataTypes.STRING,  allowNull: false, unique: true },
-        phone:        { type: DataTypes.STRING,  allowNull: false, unique: true },
-        email:        { type: DataTypes.STRING,  allowNull: false, unique: true },
-        position:     { type: DataTypes.STRING,  allowNull: true },
-        tg_username:  { type: DataTypes.STRING,  allowNull: true },
-        tg_name:      { type: DataTypes.STRING,  allowNull: true },
-        tg_id:        { type: DataTypes.STRING,  allowNull: true },
+        fullName: { type: DataTypes.STRING, allowNull: false },
+        phone: { type: DataTypes.STRING, allowNull: false },
+        email: { type: DataTypes.STRING, allowNull: false },
+        position: { type: DataTypes.STRING, allowNull: true },
+        tg_username: { type: DataTypes.STRING, allowNull: true },
+        tg_name: { type: DataTypes.STRING, allowNull: true },
+        tg_id: { type: DataTypes.STRING, allowNull: true },
         personTypeId: { type: DataTypes.INTEGER, allowNull: false, references: { model: database.publicSchema.personTypeTable, key: 'id' }, onDelete: 'SET DEFAULT', onUpdate: 'CASCADE' },
-        objectId:     { type: DataTypes.INTEGER, allowNull: false, references: { model: database.publicSchema.objectTable, key: 'id' }, onDelete: 'CASCADE', onUpdate: 'CASCADE' }
+        objectId: { type: DataTypes.INTEGER, allowNull: false, references: { model: database.publicSchema.objectTable, key: 'id' }, onDelete: 'CASCADE', onUpdate: 'CASCADE' }
     }, { Sequelize, freezeTableName: true, timestamps: false });
 
     database.publicSchema.personTypeTable.hasMany(database.publicSchema.responsiblePersonTable);
     database.publicSchema.responsiblePersonTable.belongsTo(database.publicSchema.personTypeTable);
 
-    database.publicSchema.objectTable.hasMany(database.publicSchema.responsiblePersonTable);
-    database.publicSchema.responsiblePersonTable.belongsTo(database.publicSchema.objectTable);
+    database.publicSchema.objectTable.hasMany(database.publicSchema.responsiblePersonTable, {
+        foreignKey: 'objectId',
+        as: 'responsiblePerson'
+    });
+    database.publicSchema.responsiblePersonTable.belongsTo(database.publicSchema.objectTable, {
+        foreignKey: 'objectId',
+        as: 'object'
+    });
 
     // Таблица Incident
     database.publicSchema.incidentTable = database.connection.define('incident', {
@@ -113,14 +124,12 @@ module.exports = async function database(configuration) {
         foreignKey: 'object_id'
     });
 
-
-    // Таблица parametrTable
+    // Таблица ParametrTable
     database.publicSchema.parametrTable = database.connection.define('parametr', {
         label: { type: DataTypes.STRING },
     }, { Sequelize, freezeTableName: true, timestamps: false });
 
-
-
+    // Таблица ParametrStatisctics
     database.publicSchema.parametrStatiscticsTable = database.connection.define('parametrStatisctics', {
         parametr_id: { type: DataTypes.INTEGER },
         object_id: { type: DataTypes.INTEGER },
@@ -149,8 +158,8 @@ module.exports = async function database(configuration) {
         as: 'parametr'
     });
 
-
     database.connection.options.logging = false;
+
     await database.connection.authenticate();
     await database.connection.sync();
 

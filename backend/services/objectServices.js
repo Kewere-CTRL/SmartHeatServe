@@ -139,6 +139,18 @@ class ObjectServices {
         }
     }
 
+    async fetchAllData() {
+        try {
+            const result = await database.publicSchema.objectTable.findAll();
+
+            return result;
+        } catch (error) {
+            console.error('Ошибка при извлечении данных:', error.message);
+            throw new Error(error.message);
+        }
+    }
+
+
 
 
     startPeriodicRequest() {

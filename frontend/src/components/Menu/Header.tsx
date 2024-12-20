@@ -28,41 +28,9 @@ const Header = () => {
     const isAdmin = user.roleId === 2 || user.roleId === 3;
     const isDispatcher = user.roleId === 4;
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const sectionsResponse = await api.get('section/1');
-                setSections(sectionsResponse.data.data);
 
-                const thermalsResponse = await api.get('thermalCircuit/1');
-                setThermals(thermalsResponse.data.data);
-            } catch (error) {
-                console.error('Ошибка при получении данных', error);
-            }
-        };
-        fetchData();
-    }, []);
 
-    useEffect(() => {
-        const sendSettingsModeRequest = async () => {
-            const apiUrl = settingsMode
-                ? 'device/permitJoin/true'
-                : 'device/permitJoin/false';
 
-            try {
-                const response = await api.post(apiUrl);
-                if (response.status !== 200) {
-                    console.error(`Ошибка при отправке запроса к ${apiUrl}: ${response.status} ${response.statusText}`);
-                }
-            } catch (error) {
-                console.error('Ошибка при отправке запроса:', error);
-            }
-        };
-
-        if (settingsMode) {
-            sendSettingsModeRequest();
-        }
-    }, [settingsMode]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {

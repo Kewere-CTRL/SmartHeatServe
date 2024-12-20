@@ -50,6 +50,20 @@ class ObjectController {
             res.status(500).json({ message: error.message });
         }
     }
+    async getAllBuildingsData(req, res) {
+        try {
+            const buildingsData = await service.fetchAllData();
+
+            res.status(200).json({
+                message: 'Данные успешно получены',
+                data: buildingsData
+            });
+        } catch (error) {
+            console.error('Ошибка в ObjectController:', error.message);
+            res.status(500).json({ error: error.message });
+        }
+    }
+
 
 }
 

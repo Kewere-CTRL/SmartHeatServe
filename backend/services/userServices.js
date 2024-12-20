@@ -88,8 +88,7 @@ class UserService {
 
         let user = await database.publicSchema.userTable.create(setUser);
         let userDto = new userDTO(user);
-        let token = tokenService.generateTokens({...userDto});
-
+        let token = tokenService.generateTokens({ id: user.id });
         await tokenService.saveToken(user.id, token.refreshToken);
 
         return { ...token, user: userDto };
