@@ -1,56 +1,69 @@
 import React, { useState, useEffect } from 'react';
-import DefaultLayout from "../../layouts/DefaultLayout.tsx";
-import Label from "../../components/Text/Label.tsx";
-import AddButton from "../../components/Buttons/AddButton.tsx";
-import AddObjectModal from "../../components/Modal/Add/AddObjectModal.tsx";
-import {fetchAllObjects} from "../../api/requests/objectApi.ts";
-import ItemTable from "../../components/Tables/ItemTable.tsx";
-
+import DefaultLayout from "../../layouts/DefaultLayout";
+import Label from "../../components/Text/Label";
+import AddButton from "../../components/Buttons/AddButton";
+import AddObjectModal from "../../components/Modal/Add/AddObjectModal";
+import DeleteObjectModal from "../../components/Modal/Delete/DeleteObjectModal";
+import { fetchAllObjects } from "../../api/requests/objectApi";
+import ItemTable from "../../components/Tables/ItemTable";
+import { transformObjectsData } from "../../models/Building";
+import { setBreadcrumb } from "../../store/slices/breadcrumbSlice";
+import { useDispatch } from "react-redux";
+import ReloadButton from "../../components/Buttons/ReloadButton.tsx";
 
 const BuildingPage = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [selectedObject, setSelectedObject] = useState<{ id: number, label: string } | null>(null);
     const [objects, setObjects] = useState<any[]>([]);
+    const dispatch = useDispatch();
+
     const headers = {
-        'Адрес': 'address',
-        'Город': 'city',
-        'IP адрес': 'ip',
         'Название объекта': 'label',
-        'Баланс содержатель': 'balanceHolderLabel',
-
-        'Компактность': 'compactnessIndicator',
-        'Объем строительства': 'constructionVolume',
-        'Дата создания': 'createdAt',
-        'Тип ECL': 'eclType',
-        'Этаж': 'floor',
-        'Отопленная площадь': 'heatedArea',
+        'IP адрес': 'ip',
+        'Город': 'city',
+        'Адрес': 'address',
+        'Последняя активность': 'createdAt',
         'Статус': 'status',
-        'Часовой пояс': 'timeZone_id',
-        'Всего устройств': 'totalDevices',
-        'Всего комнат': 'totalRooms'
-    };
-
-
-    const handleOpenModal = () => setIsModalOpen(true);
-
-    const handleCloseModal = () => setIsModalOpen(false);
-
-    const handleSubmit = (ip: string) => {
-        console.log('IP-адрес добавлен:', ip);
-        handleCloseModal();
+        'Часовой пояс': 'timeZone',
+        '': 'delete',
+        ' ': 'reload'
     };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await fetchAllObjects();
-                setObjects(data);
-                console.log(data)
-            } catch (error) {
-                console.error("Error fetching objects:", error.message);
-            } finally {
-            }
-        };
+        dispatch(setBreadcrumb({
+            key: 'building',
+            label: 'Главная страница',
+            icon: 'LuMonitor',
+            id: 1
+        }));
+    }, [dispatch]);
 
+    const handleOpenAddModal = () => setIsAddModalOpen(true);
+    const handleCloseAddModal = () => setIsAddModalOpen(false);
+
+    const handleOpenDeleteModal = (id: number, label: string) => {
+        setSelectedObject({ id, label });
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleCloseDeleteModal = () => {
+        setSelectedObject(null);
+        setIsDeleteModalOpen(false);
+    };
+
+    const fetchData = async () => {
+        try {
+            const data = await fetchAllObjects();
+            const transformedData = transformObjectsData(data, handleOpenDeleteModal);
+            setObjects(transformedData);
+            console.log('transformedData', transformedData);
+        } catch (error) {
+            console.error("Ошибка при получении данных объектов:", error.message);
+        }
+    };
+
+    useEffect(() => {
         fetchData();
     }, []);
 
@@ -60,24 +73,35 @@ const BuildingPage = () => {
                 <div className="flex justify-between">
                     <div className="w-1/2">
                         <Label text="Информация об объектах"/>
-                        <AddButton onClick={handleOpenModal}/>
+                        <div className="flex items-center ">
+                            <AddButton onClick={handleOpenAddModal}/>
+                            <ReloadButton/>
+                        </div>
                     </div>
                 </div>
                 <ItemTable
                     headers={headers}
                     data={objects}
-                    nonSortableColumns={['status']}
+                    tableStyles='table-auto border-collapse relative'
                 />
-                {isModalOpen && (
+                {isAddModalOpen && (
                     <AddObjectModal
-                        onClose={handleCloseModal}
-                        onSubmit={handleSubmit}
+                        onClose={handleCloseAddModal}
+                        onSubmit={fetchData}
                         loading={false}
+                    />
+                )}
+                {isDeleteModalOpen && selectedObject && (
+                    <DeleteObjectModal
+                        id={selectedObject.id}
+                        label={selectedObject.label}
+                        onClose={handleCloseDeleteModal}
+                        onSuccess={fetchData}
                     />
                 )}
             </div>
         </DefaultLayout>
     );
-}
+};
 
 export default BuildingPage;

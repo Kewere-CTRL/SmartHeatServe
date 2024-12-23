@@ -36,7 +36,6 @@ const ItemTable = ({
 
     const tableRef = useRef<HTMLDivElement | null>(null);
     const lastRowRef = useRef<HTMLTableRowElement | null>(null);
-
     useEffect(() => {
         sortData();
     }, [data, sortConfig]);
@@ -126,28 +125,25 @@ const ItemTable = ({
     const getCellContent = (value: any, columnName: string) => {
         if (columnName === 'status') {
             switch (value) {
-                case 'Активный':
-                    return (
-                        <>
-                            <FaExclamationTriangle className="text-red-500 mr-1 inline" />
-                            <span className="text-red-500 underline">{value}</span>
-                        </>
-                    );
-                case 'Устранен':
+                case 'Активен':
                     return (
                         <>
                             <FaCheckCircle className="text-green-500 mr-1 inline" />
-                            <span className="text-green-500 underline">{value}</span>
+                            <span className="text-green-500 ">{value}</span>
                         </>
                     );
-                case 'Онлайн':
-                    return <span className="text-green-500">{value}</span>;
-                case 'Оффлайн':
-                    return <span className="text-red-500">{value}</span>;
+                case 'Неактивен':
+                    return (
+                        <>
+                            <FaExclamationTriangle className="text-red-500 mr-1 inline" />
+                            <span className="text-red-500 ">{value}</span>
+                        </>
+                    );
                 default:
                     return value;
             }
         }
+
         return value;
     };
 
@@ -221,7 +217,7 @@ const ItemTable = ({
                         .map((header, index) => (
                             <th
                                 key={index}
-                                className="p-2 border border-gray-300 text-left cursor-pointer"
+                                className="p-2 border border-gray-300 text-left "
                                 onClick={() =>
                                     !nonSortableColumns.includes(header) &&
                                     ['Дата', 'Время', 'Температура', 'Влажность', 'Отклонение t°', 'Отклонение h'].includes(header) &&

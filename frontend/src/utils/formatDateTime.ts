@@ -1,12 +1,10 @@
-import moment from "moment-timezone";
+import moment from "moment";
 
 export const formatDateTime = (
     dateTime: string | number
 ): { date: string; time: string } => {
-    const timezone = localStorage.getItem("buildingTimezone") || "Europe/Moscow";
-
     return {
-        date: moment.utc(Number(dateTime)).tz(timezone).format("DD.MM.YYYY"),
-        time: moment.utc(Number(dateTime)).tz(timezone).format("HH:mm"),
+        date: moment(Number(dateTime)).local().format("DD.MM.YYYY"),
+        time: moment(Number(dateTime)).local().format("HH:mm"),
     };
 };

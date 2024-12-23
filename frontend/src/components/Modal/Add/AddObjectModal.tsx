@@ -16,6 +16,7 @@ const AddObjectModal: React.FC<{ onClose: () => void; onSubmit: (ip: string) => 
             try {
                 await addObject(ipAddress);
                 toast.success('Объект успешно добавлен!');
+                await onSubmit(ipAddress);
                 onClose();
             } catch (error: any) {
                 const errorMessage = error.message || 'Неполадки с сервером';

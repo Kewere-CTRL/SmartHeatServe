@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import * as Icons from 'react-icons/fa';
+import * as Icons from 'react-icons/lu';
 
 const Breadcrumbs = () => {
     const location = useLocation();

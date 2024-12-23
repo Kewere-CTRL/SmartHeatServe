@@ -7,7 +7,7 @@ const NotFoundPage = () => {
                 <div className="bg-white p-6 rounded shadow-md w-80 text-center">
                     <h2 className="text-2xl font-bold text-black">404</h2>
                     <p className="text-black text-nowrap">Такой страницы не существует.</p>
-                    <BlueLink to="/user" text="Вернуться на главную."/>
+                    <BlueLink to="/building" text="Вернуться на главную."/>
                 </div>
             </div>
         </div>

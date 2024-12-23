@@ -63,6 +63,25 @@ class ObjectController {
             res.status(500).json({ error: error.message });
         }
     }
+    async deleteObcject(req, res) {
+        try {
+            const { id } = req.params;
+            const result = await service.deleteObject(id);
+
+            if (result === 0) {
+                return res.status(404).json({
+                    message: 'Объект с таким ID не найден'
+                });
+            }
+            res.status(200).json({
+                message: 'Объект успешно удален',
+                data: { id }
+            });
+        } catch (error) {
+            console.error('Ошибка в ObjectController:', error.message);
+            res.status(500).json({ error: error.message });
+        }
+    }
 
 
 }

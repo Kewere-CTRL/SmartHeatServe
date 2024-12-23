@@ -82,7 +82,7 @@ const Header = () => {
         <header className="bg-gray-800 text-white w-full fixed top-0 left-0 z-50">
             <nav className="flex justify-between items-center py-3 px-6">
                 <div className="flex items-center">
-                    <Link className="text-xl text-white" to='/building'>SmartHeat </Link>
+                    <Link className="text-xl text-white" to='/building'>SmartHeat - Центральный монитор</Link>
                 </div>
                 <div className="flex items-center">
                     {/*<SearchFull onSearch={handleSearch} />*/}

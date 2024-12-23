@@ -141,7 +141,14 @@ class ObjectServices {
 
     async fetchAllData() {
         try {
-            const result = await database.publicSchema.objectTable.findAll();
+            const result = await database.publicSchema.objectTable.findAll({
+                attributes: ['id','label', 'city', 'address', 'ip', 'status', 'createdAt'],
+                include: [{
+                    model: database.publicSchema.timeZoneTable,
+                    attributes: ['label'],
+                    as: 'timeZone'
+                }]
+            });
 
             return result;
         } catch (error) {
@@ -149,8 +156,21 @@ class ObjectServices {
             throw new Error(error.message);
         }
     }
+    async deleteObject(id) {
+        try {
+            const result = await database.publicSchema.objectTable.destroy({
+                where: { id: id }
+            });
+            if (result === 0) {
+                throw new Error('Объект с таким id не найден');
+            }
 
-
+            return result;
+        } catch (error) {
+            console.error('Ошибка при удалении объекта:', error.message);
+            throw new Error(error.message);
+        }
+    }
 
 
     startPeriodicRequest() {
@@ -165,19 +185,28 @@ class ObjectServices {
                     const id = obj.id;
                     console.log(`Запрос для объекта с ID: ${id} и IP: ${ip}`);
 
-                    const url = `http://${ip}:5003/api/ecl/all`;
+                    const url = `http://${ip}:5000/api/`;
+
                     try {
-                        const response = await axios.get(url);
+                        const response = await axios.get(url, { timeout: 15000 });  // Таймаут 15 секунд
 
                         if (response.data && response.data.data) {
                             console.log(`Результат запроса для объекта с ID: ${id} и IP: ${ip}`);
                             console.log(response.data);
+
                             await database.publicSchema.objectTable.update(
-                                { status: true },
+                                {
+                                    status: true,
+                                    createdAt: Date.now()
+                                },
                                 { where: { id: id } }
                             );
                         } else {
                             console.log(`Нет данных для объекта с ID: ${id} и IP: ${ip}`);
+                            await database.publicSchema.objectTable.update(
+                                { status: false },
+                                { where: { id: id } }
+                            );
                         }
                     } catch (err) {
                         console.error(`Ошибка при запросе для объекта с ID: ${id} и IP: ${ip}:`, err.message);
@@ -187,6 +216,7 @@ class ObjectServices {
                         );
                     }
                 });
+
                 await Promise.all(promises);
 
             } catch (error) {
@@ -194,6 +224,7 @@ class ObjectServices {
             }
         }, 30000);
     }
+
 
 
 }

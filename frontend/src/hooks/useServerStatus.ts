@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import api from "../api/api.ts";
 
 const useServerStatus = (onConnectionRestored) => {
     const [serverConnected, setServerConnected] = useState(true);
@@ -7,6 +8,7 @@ const useServerStatus = (onConnectionRestored) => {
 
     const checkServerConnection = async () => {
         try {
+             await api.get("object/all")
             setServerConnected(true);
         } catch (error) {
             setServerConnected(false);

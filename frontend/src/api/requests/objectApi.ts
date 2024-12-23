@@ -39,3 +39,16 @@ export const fetchAllObjects = async () => {
     }
 };
 
+export const deleteObject = async (id) => {
+    try {
+        const response = await api.delete(`/object/${id}`);
+
+        if (response.data && response.data.message === "Объект успешно удален") {
+            return
+        }
+        throw new Error("Неполадки с сервером. Попробуйте позже.");
+    } catch (error: any) {
+        console.error("API Error:", error);
+        throw new Error("Не получилось удалить объект, попробуйте позже.");
+    }
+};

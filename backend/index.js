@@ -40,7 +40,7 @@ const start = async () => {
         module.exports.publicSchema = database.publicSchema;
         module.exports.query = database.query;
 
-        //objectServices.startPeriodicRequest();
+        objectServices.startPeriodicRequest();
 
         app.listen(PORT, () => {
             console.log(`Server started on port ${PORT}`);

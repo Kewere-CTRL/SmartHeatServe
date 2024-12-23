@@ -49,10 +49,16 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
     const handleMouseDown = () => {
         if (!deleteMode) return;
         setHoldProgress(0);
+
+        if (holdTimeout.current) {
+            clearInterval(holdTimeout.current);
+        }
+
         holdTimeout.current = setInterval(() => {
-            setHoldProgress(prev => {
+            setHoldProgress((prev) => {
                 if (prev >= 100) {
                     clearInterval(holdTimeout.current!);
+                    holdTimeout.current = null;
                     onSubmit();
                     return prev;
                 }
@@ -65,6 +71,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
         if (!deleteMode) return;
         if (holdTimeout.current) {
             clearInterval(holdTimeout.current);
+            holdTimeout.current = null;
             setHoldProgress(0);
         }
     };
@@ -147,9 +154,9 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
                     {buttonLabel && (
                         <div
                             className="relative"
-                            onMouseDown={handleMouseDown}
-                            onMouseUp={handleMouseUp}
-                            onMouseLeave={handleMouseUp}
+                            onMouseDown={deleteMode ? handleMouseDown : undefined}
+                            onMouseUp={deleteMode ? handleMouseUp : undefined}
+                            onMouseLeave={deleteMode ? handleMouseUp : undefined}
                         >
                             <button
                                 ref={submitButtonRef}
