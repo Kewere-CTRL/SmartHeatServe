@@ -32,7 +32,7 @@ class ObjectController {
                 return res.status(400).json({ message: 'IP-адрес не указан' });
             }
 
-            const buildingData = await service.updateDataFromIP(ip);
+            const buildingData = await service.updateDataForIP(ip);
 
             res.status(200).json({
                 message: 'Данные успешно обновлены',
@@ -50,9 +50,40 @@ class ObjectController {
             res.status(500).json({ message: error.message });
         }
     }
+    async updateAllBuildingData(req, res) {
+        try {
+
+            const buildingData = await service.updateAllDataFromIPs();
+
+            res.status(200).json({
+                message: 'Данные успешно обновлены',
+                data: buildingData
+            });
+
+        } catch (error) {
+
+            console.error('Ошибка в ObjectController:', error.message);
+            res.status(500).json({ message: error.message });
+        }
+    }
     async getAllBuildingsData(req, res) {
         try {
             const buildingsData = await service.fetchAllData();
+
+            res.status(200).json({
+                message: 'Данные успешно получены',
+                data: buildingsData
+            });
+        } catch (error) {
+            console.error('Ошибка в ObjectController:', error.message);
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async getBuildingsDataById(req, res) {
+        try {
+            const { id } = req.params;
+            const buildingsData = await service.fetchDataById(id);
 
             res.status(200).json({
                 message: 'Данные успешно получены',

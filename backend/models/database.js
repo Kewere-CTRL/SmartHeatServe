@@ -84,6 +84,32 @@ module.exports = async function database(configuration) {
     database.publicSchema.objectTable.belongsTo(database.publicSchema.timeZoneTable, {
         foreignKey: 'timeZone_id'
     });
+    // Таблица ObjectStatistic
+    database.publicSchema.objectStatisticTable = database.connection.define('objectStatistic', {
+        objectId: {type: DataTypes.INTEGER, allowNull: false, references: {
+                model: database.publicSchema.objectTable,
+                key: 'id'
+            },
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE'
+        },
+        activeIncidentsCount: {type: DataTypes.INTEGER, allowNull: true},
+        highPriorityActiveIncidentsCount: {type: DataTypes.INTEGER, allowNull: true},
+        thermalCircuitTemperature: {type: DataTypes.FLOAT, allowNull: true},
+        Tnar: {type: DataTypes.FLOAT, allowNull: true},
+        updatedAt: { type: DataTypes.BIGINT },
+    }, {
+        Sequelize,
+        freezeTableName: true,
+        timestamps: false
+    });
+
+    database.publicSchema.objectTable.hasOne(database.publicSchema.objectStatisticTable, {
+        foreignKey: 'objectId'
+    });
+    database.publicSchema.objectStatisticTable.belongsTo(database.publicSchema.objectTable, {
+        foreignKey: 'objectId'
+    });
 
     // Таблица ResponsiblePerson
     database.publicSchema.responsiblePersonTable = database.connection.define('responsiblePerson', {
@@ -124,39 +150,7 @@ module.exports = async function database(configuration) {
         foreignKey: 'object_id'
     });
 
-    // Таблица ParametrTable
-    database.publicSchema.parametrTable = database.connection.define('parametr', {
-        label: { type: DataTypes.STRING },
-    }, { Sequelize, freezeTableName: true, timestamps: false });
 
-    // Таблица ParametrStatisctics
-    database.publicSchema.parametrStatiscticsTable = database.connection.define('parametrStatisctics', {
-        parametr_id: { type: DataTypes.INTEGER },
-        object_id: { type: DataTypes.INTEGER },
-        temperature: { type: DataTypes.FLOAT },
-        value: { type: DataTypes.FLOAT },
-        createdAt: { type: DataTypes.BIGINT }
-    }, { Sequelize, freezeTableName: true, timestamps: false });
-
-    database.publicSchema.objectTable.hasMany(database.publicSchema.parametrStatiscticsTable, {
-        foreignKey: 'object_id',
-        as: 'parametrStatistics'
-    });
-
-    database.publicSchema.parametrStatiscticsTable.belongsTo(database.publicSchema.objectTable, {
-        foreignKey: 'object_id',
-        as: 'object'
-    });
-
-    database.publicSchema.parametrTable.hasMany(database.publicSchema.parametrStatiscticsTable, {
-        foreignKey: 'parametr_id',
-        as: 'parametrStatistics'
-    });
-
-    database.publicSchema.parametrStatiscticsTable.belongsTo(database.publicSchema.parametrTable, {
-        foreignKey: 'parametr_id',
-        as: 'parametr'
-    });
 
     database.connection.options.logging = false;
 

@@ -14,6 +14,7 @@ module.exports = class ObjectDTO {
     compactnessIndicator;
     allDayMode;
     responsiblePersons;
+    buildingParams;
 
     constructor(data, ip) {
         this.label = data.label;
@@ -31,6 +32,7 @@ module.exports = class ObjectDTO {
         this.compactnessIndicator = data.compactnessIndicator || null;
         this.allDayMode = data.allDayMode || null;
         this.responsiblePersons = data.responsiblePersons || [];
+        this.buildingParams = data.buildingParams || [];
     }
 
     extractCity(address) {

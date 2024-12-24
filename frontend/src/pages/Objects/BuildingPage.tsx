@@ -26,9 +26,14 @@ const BuildingPage = () => {
         'Последняя активность': 'createdAt',
         'Статус': 'status',
         'Часовой пояс': 'timeZone',
+        'Инциденты': 'activeIncidentsCount',
+        'Инциденты с высокой критичностью': 'highPriorityActiveIncidentsCount',
+        't ТК °C': 'thermalCircuitTemperature',
+        'T_нар °C': 'Tnar',
         '': 'delete',
         ' ': 'reload'
     };
+
 
     useEffect(() => {
         dispatch(setBreadcrumb({

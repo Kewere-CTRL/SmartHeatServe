@@ -1,9 +1,13 @@
-import {FaRegTrashAlt} from "react-icons/fa";
+import { FaRegTrashAlt } from "react-icons/fa";
 import BlueLink from "../components/Text/BlueLink.tsx";
 import { formatDateTime } from "../utils/formatDateTime.ts";
-import {TfiReload} from "react-icons/tfi";
+import { TfiReload } from "react-icons/tfi";
 
-export const transformObjectsData = (data: any[], deleteObject: (id: number, label: string) => void, reloadObject: (id: number) => void) => {
+export const transformObjectsData = (
+    data: any[],
+    deleteObject: (id: number, label: string) => void,
+    reloadObject: (id: number) => void
+) => {
     return data.map(item => ({
         id: item.id,
         label: item.label || '—',
@@ -20,6 +24,12 @@ export const transformObjectsData = (data: any[], deleteObject: (id: number, lab
         status: item.status ? 'Активен' : 'Неактивен',
         createdAt: formatDateTime(item.createdAt).date + ' ' + formatDateTime(item.createdAt).time,
         timeZone: item.timeZone?.label || '—',
+
+        activeIncidentsCount: item.objectStatistic?.activeIncidentsCount || '—',
+        highPriorityActiveIncidentsCount: item.objectStatistic?.highPriorityActiveIncidentsCount || '—',
+        thermalCircuitTemperature: item.objectStatistic?.thermalCircuitTemperature || '—',
+        Tnar: item.objectStatistic?.Tnar || '—',
+
         delete: (
             <button
                 onClick={() => deleteObject(item.id, item.label)}
@@ -42,3 +52,4 @@ export const transformObjectsData = (data: any[], deleteObject: (id: number, lab
         )
     }));
 };
+
